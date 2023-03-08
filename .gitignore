@@ -1,0 +1,6 @@
+# Ignore IDE configuration files
+.vscode
+
+# Ignore build output
+build
+dist
