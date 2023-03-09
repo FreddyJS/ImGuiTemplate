@@ -10,9 +10,7 @@
 #include "imgui_impl_opengl3.h"
 #define GL_SILENCE_DEPRECATION
 
-#if defined(IMGUI_IMPL_OPENGL_ES2)
-#include <GLES2/gl2.h>
-#endif
+#include <glad/gl.h>    // Initialize with gladLoadGL(glfwGetProcAddress)
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -23,11 +21,6 @@
 // Your own project should not be affected, as you are likely to link with a newer binary of GLFW that is adequate for your version of Visual Studio.
 #if defined(_MSC_VER) && (_MSC_VER >= 1900) && !defined(IMGUI_DISABLE_WIN32_FUNCTIONS)
 #pragma comment(lib, "legacy_stdio_definitions")
-#endif
-
-// This example can also compile and run with Emscripten! See 'Makefile.emscripten' for details.
-#ifdef __EMSCRIPTEN__
-#include "emscripten_mainloop_stub.h"
 #endif
 
 // Is called whenever a key is pressed/released via GLFW
@@ -94,6 +87,16 @@ int main(int, char**)
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
+
+    if (gladLoadGL(glfwGetProcAddress) == 0)
+    {
+        fprintf(stderr, "Failed to initialize OpenGL loader!\n");
+        return 1;
+    }
+    else
+    {
+        fprintf(stdout, "OpenGL loader initialized\n");
+    }
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -166,14 +169,7 @@ int main(int, char**)
     printf("OpenGL texture uploaded\n");
 
     // Main loop
-#ifdef __EMSCRIPTEN__
-    // For an Emscripten build we are disabling file-system access, so let's not attempt to do a fopen() of the imgui.ini file.
-    // You may manually call LoadIniSettingsFromMemory() to load settings from your own storage.
-    io.IniFilename = NULL;
-    EMSCRIPTEN_MAINLOOP_BEGIN
-#else
     while (!glfwWindowShouldClose(window))
-#endif
     {
         // Poll and handle events (inputs, window resize, etc.)
         // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
@@ -210,8 +206,8 @@ int main(int, char**)
             ImGui::SameLine();
             ImGui::Text("counter = %d", counter);
 
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-            ImGui::Image((void *)(intptr_t)image_texture, ImVec2(image_width, image_height));
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", (float) 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            ImGui::Image((void *)(intptr_t)image_texture, ImVec2((float) image_width, (float) image_height));
 
             ImGui::End();
         }
@@ -237,9 +233,6 @@ int main(int, char**)
 
         glfwSwapBuffers(window);
     }
-#ifdef __EMSCRIPTEN__
-    EMSCRIPTEN_MAINLOOP_END;
-#endif
 
     printf("\n- UpTime: %.2f seconds -\n", glfwGetTime());
 

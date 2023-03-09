@@ -34,12 +34,11 @@ macro(make_executable)
     install(
         DIRECTORY ${CMAKE_SOURCE_DIR}/assets/ DESTINATION ${CMAKE_INSTALL_PREFIX}/assets
         FILES_MATCHING PATTERN "*")
-
 endmacro()
 
 macro(make_project_options_)
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-        target_compile_options(${PROJECT} PUBLIC /Wall)
+        target_compile_options(${PROJECT} PUBLIC /W4)
     elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         target_compile_options(${PROJECT} PUBLIC -Wall -Wextra -Wpedantic)
     elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

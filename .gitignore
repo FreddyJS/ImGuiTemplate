@@ -4,3 +4,6 @@
 # Ignore build output
 build
 dist
+
+# Ignore imgui.ini
+imgui.ini
